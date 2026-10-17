@@ -389,9 +389,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
     // Reception Desk in Entry Corridor
     const receptionDesk = new THREE.Group();
-    const deskTop = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.08, 1.1), wallWoodMat);
+    const deskTop = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.08, 0.8), wallWoodMat);
     deskTop.position.y = 0.85;
-    const deskBase = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.82, 1.0), wallConcreteMat);
+    const deskBase = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.82, 0.72), wallConcreteMat);
     deskBase.position.y = 0.41;
     const lampShade = new THREE.Mesh(
       new THREE.ConeGeometry(0.14, 0.16, 10),
@@ -401,9 +401,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         emissiveIntensity: 1.8,
       }),
     );
-    lampShade.position.set(0.28, 1.12, -0.2);
+    lampShade.position.set(0.28, 1.12, -0.15);
     receptionDesk.add(deskTop, deskBase, lampShade);
-    receptionDesk.position.set(0.75, 0, 4.95);
+    receptionDesk.position.set(0, 0, 4.9);
     scene.add(receptionDesk);
 
     // Abandoned Bedroom Iron Bed & utility props (REF_04)
@@ -1005,9 +1005,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         receiverParts.group.rotation.y = Math.PI;
       }
 
-      // Throttled HUD & Interaction Hysteresis Check (~12Hz)
+      // HUD & Interaction Hysteresis Check (runs every rendered frame in headless mode or ~15Hz on device)
       hudSyncTimer += dt;
-      if (hudSyncTimer >= 0.08) {
+      if (isHeadless || hudSyncTimer >= 0.065) {
         hudSyncTimer = 0;
 
         const room = getRoomNameAt(pTrans.x, pTrans.z);
@@ -1036,7 +1036,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           cachedPrompt = candidate;
           latestRef.current.onPromptChange(candidate);
         } else if (promptHoldTimer > 0) {
-          promptHoldTimer = Math.max(0, promptHoldTimer - 0.08);
+          promptHoldTimer = Math.max(0, promptHoldTimer - dt);
           if (promptHoldTimer <= 0) {
             currentTargetId = null;
             cachedPrompt = null;

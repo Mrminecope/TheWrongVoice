@@ -226,7 +226,7 @@ export const INITIAL_WALLS: WallBox[] = [
   { id: 'div_radio_list_s', minX: 4.0, maxX: 4.4, minZ: -7.4, maxZ: -4.5, height: 3.6, material: 'concrete' },
 
   // Solid interior furniture collision boxes (kept compact so corridors >= 2.6m wide stay clear)
-  { id: 'prop_reception_desk', minX: 0.25, maxX: 1.35, minZ: 4.4, maxZ: 5.5, height: 1.0, material: 'wood' },
+  { id: 'prop_reception_desk', minX: -0.5, maxX: 0.5, minZ: 4.5, maxZ: 5.3, height: 1.0, material: 'wood' },
   { id: 'prop_bed_frame', minX: -9.8, maxX: -7.6, minZ: 4.5, maxZ: 6.7, height: 1.0, material: 'metal' },
   { id: 'prop_kitchen_table', minX: 5.2, maxX: 7.4, minZ: 2.8, maxZ: 4.6, height: 1.0, material: 'wood' },
   { id: 'prop_radio_bench', minX: -1.8, maxX: 1.8, minZ: -11.5, maxZ: -10.2, height: 1.1, material: 'wood' },
@@ -480,10 +480,10 @@ export const INITIAL_INTERACTABLES: InteractableDef[] = [
     id: 'pickup_theo_cassette_1',
     name: 'Theo’s Cassette Tape #01',
     type: 'pickup',
-    x: 0.48,
+    x: 0.0,
     y: 0.92,
-    z: 4.95,
-    radius: 2.6,
+    z: 4.9,
+    radius: 2.8,
     itemId: 'theo_cassette_1',
     refCode: 'REF_05',
   },

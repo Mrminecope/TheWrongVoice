@@ -381,26 +381,32 @@ export function findBestInteractable(
     const dz = item.z - playerZ;
     const dist = Math.hypot(dx, dz);
 
-    // Hysteresis margin: if this item is already active, allow +0.35m extra range and wider cone
+    // Hysteresis margin: if this item is already active, allow +0.4m extra range and wider cone
     const isCurrent = item.id === currentTargetId;
-    const maxRadius = item.radius + (isCurrent ? 0.35 : 0);
+    const maxRadius = item.radius + (isCurrent ? 0.4 : 0);
     if (dist > maxRadius) continue;
 
-    if (dist > 0.25) {
+    if (dist > 0.35) {
       const dirX = dx / dist;
       const dirZ = dz / dist;
       const dot = dirX * fwdX + dirZ * fwdZ;
-      const minDot = isCurrent ? 0.32 : 0.48; // ~61 deg cone, ~71 deg hysteresis
+      const minDot = isCurrent ? 0.15 : 0.32; // ~71 deg cone, ~81 deg hysteresis for mobile comfort
       if (dot < minDot) continue;
     }
 
     // Ensure player cannot interact through solid walls (doors themselves don't block their own interaction)
-    const blockingWalls = walls.filter((w) => w.id !== `door_col_${item.doorId}`);
+    const blockingWalls = walls.filter(
+      (w) => w.id !== `door_col_${item.doorId}` && !w.id.startsWith('prop_'),
+    );
     if (!hasLineOfSight(playerX, playerZ, item.x, item.z, blockingWalls)) {
       continue;
     }
 
-    const score = dist - (isCurrent ? 0.25 : 0);
+    const isOpenDoor =
+      item.type === 'door' &&
+      item.doorId !== undefined &&
+      progress.openDoors.includes(item.doorId);
+    const score = dist - (isCurrent ? 0.3 : 0) + (isOpenDoor ? 1.85 : 0);
     if (score < bestScore) {
       bestScore = score;
       bestResult = {

@@ -19,6 +19,7 @@ import {
   HIDING_SPOTS,
   INITIAL_DOORS,
   INITIAL_INTERACTABLES,
+  INITIAL_WALLS,
   LORE_DOCUMENTS,
   PLAYER_SPAWN,
 } from './game/levelData.ts';
@@ -26,6 +27,8 @@ import {
   createInitialProgress,
   determineEnding,
   evaluateMissionProgression,
+  findBestInteractable,
+  getDoorColliders,
   getInteractableAction,
 } from './game/rules.ts';
 import {
@@ -424,9 +427,26 @@ export default function App() {
   );
 
   const handlePrimaryInteract = useCallback(() => {
-    if (!activePrompt) return;
-    executeInteractionOnTarget(activePrompt.target);
-  }, [activePrompt, executeInteractionOnTarget]);
+    if (activePrompt) {
+      executeInteractionOnTarget(activePrompt.target);
+      return;
+    }
+    const doorColliders = getDoorColliders(INITIAL_DOORS, progress.openDoors);
+    const allColliders = [...INITIAL_WALLS, ...doorColliders];
+    const fallback = findBestInteractable(
+      playerTransformRef.current.x,
+      playerTransformRef.current.z,
+      playerTransformRef.current.yaw,
+      INITIAL_INTERACTABLES,
+      progress,
+      allColliders,
+      isHiding,
+      null,
+    );
+    if (fallback) {
+      executeInteractionOnTarget(fallback.target);
+    }
+  }, [activePrompt, executeInteractionOnTarget, isHiding, progress]);
 
   const handleTapInteractTarget = useCallback(
     (targetId: string) => {
