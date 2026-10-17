@@ -342,6 +342,18 @@ export default function App() {
             audioManager.playVoiceSynthCue(false);
             triggerSubtitle('RECORDING', lore.audioTranscript, false, 7200);
           }
+          // When recovering the first cassette, a metallic clatter echoes from the North Cross-Hallway
+          // drawing The Receiver to investigate the corridor
+          if (itemId === 'theo_cassette_1') {
+            audioManager.playDecoyClatter();
+            noiseQueueRef.current.push({
+              x: 0,
+              z: 1.2,
+              loudness: 78,
+              source: 'alarm',
+              timestamp: performance.now(),
+            });
+          }
           if (
             itemId === 'operator_diary' ||
             itemId === 'freq_note' ||

@@ -45,18 +45,18 @@ export const MIMIC_VOICE_LINES = [
 export function createInitialCreature(): CreatureRuntime {
   return {
     state: 'PATROL',
-    x: -6.5,
-    z: -2.8,
-    yaw: 0,
+    x: 0,
+    z: -1.8,
+    yaw: Math.PI, // Facing South down the Entry Corridor
     targetX: 0,
     targetZ: -2.8,
     lastKnownX: 0,
     lastKnownZ: -2.8,
-    currentWaypointId: 'wp_cross_west',
+    currentWaypointId: 'wp_cross_center',
     stateTimer: 0,
     searchPoints: [],
     hidingSpotToCheck: null,
-    mimicCooldown: 12,
+    mimicCooldown: 10,
     activeMimicQuote: null,
     alertCount: 0,
     speed: 1.85,

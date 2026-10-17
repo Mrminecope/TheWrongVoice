@@ -377,33 +377,50 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       scene.add(mesh);
     }
 
-    // 5. Collapsed Wooden Corridor Planks & Framing (REF_01 & REF_15)
+    // 5. Architectural Ceiling Rafters, Baseboards & Collapsed Wooden Planks (REF_01, REF_11, REF_15)
+    for (let z = 6.5; z >= -10.5; z -= 2.4) {
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.22, 0.24), wallWoodMat);
+      beam.position.set(0, 3.48, z);
+      scene.add(beam);
+    }
+
+    // Splintered wall framing & collapsed diagonal planks in Entry Corridor (REF_01)
     for (let i = 0; i < 6; i++) {
-      const plank = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.4, 0.06), wallWoodMat);
-      const side = i % 2 === 0 ? -1.95 : 1.95;
-      plank.position.set(side, 1.2, 6.2 - i * 1.15);
-      plank.rotation.z = (i % 2 === 0 ? -1 : 1) * (0.08 + (i % 3) * 0.04);
-      plank.rotation.x = (i - 2.5) * 0.05;
+      const plank = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.55, 0.08), wallWoodMat);
+      const side = i % 2 === 0 ? -1.92 : 1.92;
+      plank.position.set(side, 1.25, 6.4 - i * 1.15);
+      plank.rotation.z = (i % 2 === 0 ? -1 : 1) * (0.11 + (i % 3) * 0.05);
+      plank.rotation.x = (i - 2.5) * 0.06;
       scene.add(plank);
     }
 
-    // Reception Desk in Entry Corridor
+    // Wall Conduits & Junction Boxes along Corridor
+    for (const side of [-1.96, 1.96]) {
+      const conduit = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 9.0, 8), fenceMat);
+      conduit.rotation.x = Math.PI / 2;
+      conduit.position.set(side, 2.75, 2.5);
+      scene.add(conduit);
+    }
+
+    // Reception Desk on Right Side of Entry Corridor (x = 1.15, z = 5.0)
     const receptionDesk = new THREE.Group();
-    const deskTop = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.08, 0.8), wallWoodMat);
-    deskTop.position.y = 0.85;
-    const deskBase = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.82, 0.72), wallConcreteMat);
-    deskBase.position.y = 0.41;
+    const deskTop = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.08, 1.15), wallWoodMat);
+    deskTop.position.y = 0.86;
+    const deskBase = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.84, 1.05), wallConcreteMat);
+    deskBase.position.y = 0.42;
+    const lampStem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 0.28, 8), fenceMat);
+    lampStem.position.set(0.22, 1.0, -0.28);
     const lampShade = new THREE.Mesh(
-      new THREE.ConeGeometry(0.14, 0.16, 10),
+      new THREE.ConeGeometry(0.15, 0.16, 12),
       new THREE.MeshStandardMaterial({
         color: 0xffe4a0,
         emissive: 0xffb84d,
-        emissiveIntensity: 1.8,
+        emissiveIntensity: 2.2,
       }),
     );
-    lampShade.position.set(0.28, 1.12, -0.15);
-    receptionDesk.add(deskTop, deskBase, lampShade);
-    receptionDesk.position.set(0, 0, 4.9);
+    lampShade.position.set(0.22, 1.15, -0.28);
+    receptionDesk.add(deskTop, deskBase, lampStem, lampShade);
+    receptionDesk.position.set(1.15, 0, 5.0);
     scene.add(receptionDesk);
 
     // Abandoned Bedroom Iron Bed & utility props (REF_04)
@@ -510,38 +527,55 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         frameGroup.rotation.y = Math.PI / 2;
       }
 
-      // Door transom header above doorway
+      // Door transom header & vertical side jambs (REF_15)
       const transom = new THREE.Mesh(
-        new THREE.BoxGeometry(d.width + 0.2, 0.9, 0.28),
+        new THREE.BoxGeometry(d.width + 0.24, 0.9, 0.3),
         wallWoodMat,
       );
       transom.position.set(0, 3.15, 0);
       frameGroup.add(transom);
 
+      for (const jSide of [-1, 1]) {
+        const jamb = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.75, 0.32), wallWoodMat);
+        jamb.position.set(jSide * (d.width / 2 + 0.05), 1.375, 0);
+        frameGroup.add(jamb);
+      }
+
       // Hinged door leaf pivoted at left jamb (-d.width / 2)
       const pivot = new THREE.Group();
       pivot.position.set(-d.width / 2, 0, 0);
 
-      const leaf = new THREE.Mesh(
-        new THREE.BoxGeometry(d.width, 2.65, 0.1),
-        new THREE.MeshStandardMaterial({
-          color: d.lockedByItem ? 0x6e5444 : 0x8c7b6b,
-          roughness: 0.78,
-          metalness: 0.15,
-        }),
-      );
-      leaf.position.set(d.width / 2, 1.325, 0);
+      const leafMat = new THREE.MeshStandardMaterial({
+        color: d.lockedByItem ? 0x5c4233 : 0x7a6654,
+        map: woodTex,
+        bumpMap: woodTex,
+        bumpScale: 0.018,
+        roughness: 0.76,
+        metalness: 0.12,
+      });
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(d.width, 2.68, 0.1), leafMat);
+      leaf.position.set(d.width / 2, 1.34, 0);
 
-      // Door handle
+      // Recessed door panels (upper & lower molding)
+      for (const py of [0.68, 1.92]) {
+        const panel = new THREE.Mesh(
+          new THREE.BoxGeometry(d.width * 0.72, 0.78, 0.125),
+          wallWoodMat,
+        );
+        panel.position.set(d.width / 2, py, 0);
+        leaf.add(panel);
+      }
+
+      // Brass Door Handle & Escutcheon Plate
       const handle = new THREE.Mesh(
-        new THREE.SphereGeometry(0.055, 8, 8),
-        new THREE.MeshStandardMaterial({ color: 0xb88c4a, roughness: 0.3, metalness: 0.85 }),
+        new THREE.SphereGeometry(0.06, 10, 10),
+        new THREE.MeshStandardMaterial({ color: 0xc99b52, roughness: 0.28, metalness: 0.88 }),
       );
-      handle.position.set(d.width - 0.18, 1.15, 0.08);
+      handle.position.set(d.width - 0.18, 1.15, 0.085);
       leaf.add(handle);
 
       const handleBack = handle.clone();
-      handleBack.position.z = -0.08;
+      handleBack.position.z = -0.085;
       leaf.add(handleBack);
 
       leaf.userData.interactableId = `int_${d.id}`;
@@ -938,9 +972,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       handheldMesh.position.x = 0.24 + Math.cos(walkBobDistance * 1.1) * 0.008;
       handheldMesh.position.y = -0.22 + Math.sin(walkBobDistance * 2.2) * 0.01;
 
-      // Step The Receiver AI (active once player has entered station or picked up first cassette)
+      // Step The Receiver AI (active as soon as the player steps onto the threshold z < 7.2 or completes Mission 1)
       const creatureActive =
-        curProg.mission !== '1_ENTER_STATION' || pTrans.z < 5.0;
+        curProg.mission !== '1_ENTER_STATION' || pTrans.z < 7.2;
       const aggression =
         curProg.mission === '7_ESCAPE'
           ? 1.25
@@ -967,22 +1001,50 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         );
         creatureStateRef = aiResult.creature;
 
-        // Update 3D articulated Receiver mesh
+        // Update 3D articulated Receiver mesh with state-driven posture & listening/searching motions
         receiverParts.group.visible = true;
         receiverParts.group.position.set(creatureStateRef.x, 0, creatureStateRef.z);
         receiverParts.group.rotation.y = creatureStateRef.yaw;
+
+        const isChasing = creatureStateRef.state === 'CHASE_VISIBLE_PLAYER';
+        const isSearching =
+          creatureStateRef.state === 'INVESTIGATE_SOUND' ||
+          creatureStateRef.state === 'SEARCH_LAST_KNOWN_POSITION' ||
+          creatureStateRef.state === 'CHECK_HIDING_SPOTS';
+
+        // Head scanning & unnatural acoustic listening tilt
         receiverParts.headGroup.rotation.z = creatureStateRef.headTilt;
-        receiverParts.leftLeg.rotation.x = Math.sin(creatureStateRef.stridePhase) * 0.42;
-        receiverParts.rightLeg.rotation.x = -Math.sin(creatureStateRef.stridePhase) * 0.42;
-        receiverParts.leftArm.rotation.x = -Math.sin(creatureStateRef.stridePhase) * 0.28;
-        receiverParts.rightArm.rotation.x = Math.sin(creatureStateRef.stridePhase) * 0.28;
+        receiverParts.headGroup.rotation.y = isSearching
+          ? Math.sin(now * 0.0045) * 0.58
+          : Math.sin(now * 0.0018) * 0.18;
+
+        // Torso pitch & breathing heave
+        receiverParts.torsoGroup.rotation.x = isChasing
+          ? 0.24
+          : isSearching
+            ? 0.14
+            : Math.sin(now * 0.0025) * 0.04;
+
+        //Eye light color/intensity shifts between pale receiver blue and hunting crimson
+        receiverParts.eyeLight.color.setHex(isChasing ? 0xff4238 : 0x9ecbff);
+        receiverParts.eyeLight.intensity = isChasing ? 1.6 : 0.95;
+
+        // Articulated limb gait
+        receiverParts.leftLeg.rotation.x = Math.sin(creatureStateRef.stridePhase) * 0.46;
+        receiverParts.rightLeg.rotation.x = -Math.sin(creatureStateRef.stridePhase) * 0.46;
+        receiverParts.leftArm.rotation.x = isChasing
+          ? -0.65 + Math.sin(creatureStateRef.stridePhase) * 0.35
+          : -Math.sin(creatureStateRef.stridePhase) * 0.28;
+        receiverParts.rightArm.rotation.x = isChasing
+          ? -0.65 - Math.sin(creatureStateRef.stridePhase) * 0.35
+          : Math.sin(creatureStateRef.stridePhase) * 0.28;
 
         const cDist = Math.hypot(creatureStateRef.x - pTrans.x, creatureStateRef.z - pTrans.z);
         audioManager.updateSpatialAmbience(
           pTrans.z > 7.5,
           curProg.powerRestored,
           cDist,
-          creatureStateRef.state === 'CHASE_VISIBLE_PLAYER',
+          isChasing,
         );
 
         if (aiResult.caughtPlayer) {
@@ -999,10 +1061,12 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           );
         }
       } else {
-        // Distant glimpse of The Receiver at the North end of the corridor during Mission 1
+        // Distant unnatural silhouette of The Receiver listening at the end of the Entry Corridor (z = -1.8)
         receiverParts.group.visible = true;
-        receiverParts.group.position.set(0, 0, -2.8);
+        receiverParts.group.position.set(0, 0, -1.8);
         receiverParts.group.rotation.y = Math.PI;
+        receiverParts.headGroup.rotation.z = Math.sin(now * 0.003) * 0.26;
+        receiverParts.headGroup.rotation.y = Math.cos(now * 0.002) * 0.32;
       }
 
       // HUD & Interaction Hysteresis Check (runs every rendered frame in headless mode or ~15Hz on device)
