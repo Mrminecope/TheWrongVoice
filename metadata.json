@@ -1,0 +1,6 @@
+{
+  "name": "THE WRONG VOICE",
+  "description": "Android-first 3D psychological survival horror game set in the abandoned Greyfen Emergency Relay Station.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
